@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype Studilife</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.9.0/dist/tabler-icons.min.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --navy:#1a2456;--navy-light:#2e3f8a;
+    --green:#22c55e;--orange:#f97316;--red:#ef4444;
+    --white:#fff;--muted:#6b7280;--border:#e5e7eb;--text:#111827;
+    --font-brand:'Nunito',sans-serif;
+    --font-body:'Inter',sans-serif;
+  }
+  body{font-family:var(--font-body);min-height:100vh;background:linear-gradient(135deg,#1a2456 0%,#2e3f8a 60%,#1a3a6b 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;}
+  .page-title{font-family:var(--font-brand);font-size:22px;font-weight:800;color:#fff;margin-bottom:1.5rem;text-align:center;}
+  .device{width:320px;height:620px;background:var(--white);border-radius:36px;border:6px solid #0f1730;box-shadow:0 24px 60px rgba(0,0,0,0.45);overflow:hidden;position:relative;display:flex;flex-direction:column;}
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.28s ease;overflow:hidden;}
+  .screen.active{opacity:1;pointer-events:all;animation:fadeSlide 0.22s ease;}
+  .navbar{background:var(--white);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 6px;flex-shrink:0;}
+  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;cursor:pointer;font-size:9px;color:var(--muted);padding:2px 6px;font-family:var(--font-body);font-weight:500;}
+  .nav-btn i{font-size:20px;}
+  .nav-btn.active{color:var(--navy);}
+  .scroll-body{overflow-y:auto;flex:1;padding:14px;}
+  .scroll-body::-webkit-scrollbar{width:0;}
+
+  .login-bg{background:var(--navy);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+  .login-logo{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+  .login-logo-inner{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-family:var(--font-brand);font-weight:800;font-size:13px;color:var(--navy);}
+  .login-title{font-family:var(--font-brand);color:#fff;font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:20px;}
+  .login-card{background:#fff;border-radius:18px;padding:20px;width:100%;}
+  .field-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;}
+  .field-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;font-family:var(--font-body);color:var(--text);margin-bottom:12px;outline:none;}
+  .btn-primary{width:100%;background:var(--navy);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;font-family:var(--font-brand);cursor:pointer;margin-bottom:10px;}
+  .btn-outline{width:100%;background:#fff;color:var(--navy);border:1.5px solid var(--border);border-radius:12px;padding:10px;font-size:12px;font-weight:600;font-family:var(--font-body);cursor:pointer;margin-bottom:8px;}
+  .divider{text-align:center;font-size:11px;color:var(--muted);margin:4px 0 10px;}
+  .link-small{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--muted);justify-content:center;margin-top:6px;}
+
+  .greeting-box{background:var(--navy);padding:16px;flex-shrink:0;}
+  .greeting-box .greet{font-family:var(--font-brand);color:#fff;font-size:17px;font-weight:800;}
+  .greeting-box .sub{color:rgba(255,255,255,0.7);font-size:11.5px;margin-top:2px;}
+  .stats-row{display:flex;gap:8px;margin-top:14px;}
+  .stat-card{background:rgba(255,255,255,0.15);border-radius:12px;flex:1;padding:10px 8px;text-align:center;}
+  .stat-num{font-family:var(--font-brand);color:#fff;font-size:20px;font-weight:800;}
+  .stat-lbl{color:rgba(255,255,255,0.7);font-size:10px;margin-top:1px;}
+  .section-title{font-family:var(--font-brand);font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px;margin-top:6px;}
+  .action-card{display:flex;align-items:center;gap:10px;padding:12px;background:#fff;border-radius:14px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:background 0.12s;}
+  .action-card:hover{background:#f8fafc;}
+  .action-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .action-icon i{font-size:19px;color:#fff;}
+  .action-icon.blue{background:var(--navy);}
+  .action-icon.orange{background:var(--orange);}
+  .action-icon.green{background:var(--green);}
+  .action-text .t{font-family:var(--font-brand);font-size:13px;font-weight:700;color:var(--text);}
+  .action-text .s{font-size:11px;color:var(--muted);}
+  .action-arrow{margin-left:auto;color:var(--muted);}
+  .alert-bar{background:#fef9c3;border-left:3px solid #ca8a04;border-radius:8px;padding:8px 12px;font-size:11px;color:#854d0e;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+  .top-bar{background:var(--navy);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .top-bar .logo{color:#fff;font-family:var(--font-brand);font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px;}
+  .logo-circle{width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-brand);font-weight:800;font-size:9px;color:var(--navy);}
+
+  .screen-heading{font-family:var(--font-brand);font-size:16px;font-weight:800;color:var(--text);margin-bottom:12px;}
+  .search-bar{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .search-bar input{border:none;outline:none;flex:1;font-size:13px;color:var(--text);background:transparent;}
+  .map-container{position:relative;height:160px;border-radius:14px;overflow:hidden;margin-bottom:12px;border:1px solid var(--border);}
+  .map-container iframe{width:100%;height:100%;border:none;display:block;}
+  .map-overlay-btn{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:11px;font-family:var(--font-brand);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,0.25);white-space:nowrap;}
+  .map-overlay-btn.active{background:#16a34a;}
+  .map-zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:3px;}
+  .map-zoom button{width:26px;height:26px;background:#fff;border:1px solid var(--border);border-radius:6px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,0.12);}
+  .place-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:background 0.12s;}
+  .place-row:hover{background:#f0f4ff;}
+  .place-icon{width:32px;height:32px;border-radius:8px;background:#e8eeff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .place-icon i{font-size:16px;color:var(--navy-light);}
+  .place-info .t{font-family:var(--font-brand);font-size:13px;font-weight:700;color:var(--text);}
+  .place-info .s{font-size:10.5px;color:var(--muted);}
+  .place-badge{margin-left:auto;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .badge-free{background:#dcfce7;color:#166534;}
+  .badge-rdv{background:#fef9c3;color:#854d0e;}
+
+  .signal-header{background:var(--navy);padding:16px;flex-shrink:0;}
+  .signal-header .title{font-family:var(--font-brand);color:#fff;font-size:16px;font-weight:800;}
+  .signal-header .sub{color:rgba(255,255,255,0.7);font-size:11px;margin-top:2px;}
+  .recent-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .dot.green{background:var(--green);}
+  .dot.orange{background:var(--orange);}
+  .recent-info .t{font-family:var(--font-brand);font-size:12px;font-weight:700;color:var(--text);}
+  .recent-info .s{font-size:10.5px;color:var(--muted);}
+  .recent-badge{margin-left:auto;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;}
+  .badge-resolu{background:#dcfce7;color:#166534;}
+  .badge-encours{background:#fef9c3;color:#854d0e;}
+  .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+  .cat-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all 0.15s;}
+  .cat-card:hover,.cat-card.selected{border-color:var(--navy);background:#eff1ff;}
+  .cat-card i{font-size:20px;color:var(--navy-light);display:block;margin-bottom:4px;}
+  .cat-card span{font-size:10px;font-weight:600;color:var(--text);}
+  .select-field{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);margin-bottom:10px;outline:none;background:#fff;}
+  .photo-zone{border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px;}
+  .btn-send{width:100%;background:var(--navy);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;font-family:var(--font-brand);cursor:pointer;}
+
+  .wellbeing-header{background:#16a34a;padding:16px;flex-shrink:0;}
+  .wellbeing-header .title{font-family:var(--font-brand);color:#fff;font-size:16px;font-weight:800;}
+  .wellbeing-header .sub{color:rgba(255,255,255,0.8);font-size:11px;margin-top:2px;}
+  .anon-badge{background:rgba(255,255,255,0.2);border-radius:6px;padding:4px 10px;font-size:10px;color:#fff;display:inline-flex;align-items:center;gap:4px;margin-top:6px;}
+  .mood-q{font-family:var(--font-brand);font-size:15px;font-weight:800;color:var(--text);margin-bottom:14px;text-align:center;margin-top:10px;}
+  .emoji-row{display:flex;justify-content:space-around;margin-bottom:14px;}
+  .emoji-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px;border-radius:10px;border:2px solid transparent;transition:all 0.15s;background:none;}
+  .emoji-btn:hover{background:#f0fdf4;}
+  .emoji-btn.selected{border-color:#16a34a;background:#dcfce7;}
+  .emoji-btn .em{font-size:24px;}
+  .emoji-btn .lb{font-size:9px;color:var(--muted);text-align:center;max-width:44px;line-height:1.2;}
+  .textarea-field{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px;font-size:13px;color:var(--text);resize:none;height:64px;outline:none;margin-bottom:12px;}
+  .btn-green{width:100%;background:#16a34a;color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;font-family:var(--font-brand);cursor:pointer;margin-bottom:14px;}
+  .campus-mood .cm-title{font-family:var(--font-brand);font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px;}
+  .mood-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .mood-bar-row .em{font-size:15px;}
+  .bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;}
+  .bar-pct{font-size:11px;color:var(--muted);width:28px;text-align:right;}
+
+  .profil-header{background:var(--navy);padding:20px 16px;display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .avatar{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+  .avatar-init{font-family:var(--font-brand);font-size:20px;font-weight:800;color:#fff;}
+  .profil-name{font-family:var(--font-brand);color:#fff;font-size:17px;font-weight:800;}
+  .profil-sub{color:rgba(255,255,255,0.7);font-size:11px;margin-top:2px;}
+  .status-pill{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:3px 12px;font-size:10px;color:#fff;margin-top:8px;display:flex;align-items:center;gap:4px;}
+  .status-dot{width:6px;height:6px;background:var(--green);border-radius:50%;}
+  .info-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);}
+  .info-row i{font-size:18px;color:var(--navy-light);}
+  .info-row .t{font-family:var(--font-brand);font-size:13px;font-weight:700;color:var(--text);}
+  .info-row .s{font-size:11px;color:var(--muted);}
+  .pref-section{font-family:var(--font-brand);font-size:13px;font-weight:800;color:var(--text);margin:14px 0 6px;}
+  .pref-row{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);}
+  .pref-row i{font-size:18px;color:var(--muted);margin-right:10px;}
+  .pref-row .lbl{font-size:13px;color:var(--text);flex:1;}
+  .toggle{width:38px;height:22px;background:var(--green);border-radius:11px;position:relative;cursor:pointer;}
+  .toggle-off{background:var(--border);}
+  .toggle-knob{position:absolute;top:3px;right:3px;width:16px;height:16px;background:#fff;border-radius:50%;}
+  .toggle-off .toggle-knob{right:auto;left:3px;}
+  .pref-val{font-size:12px;color:var(--muted);}
+  .btn-logout{width:100%;margin-top:16px;border:1.5px solid #fee2e2;border-radius:12px;padding:11px;font-size:13px;font-weight:700;font-family:var(--font-brand);color:var(--red);background:#fff;cursor:pointer;}
+
+  .toast{position:absolute;bottom:72px;left:50%;transform:translateX(-50%) translateY(60px);background:#1a2456;color:#fff;border-radius:12px;padding:10px 20px;font-size:12px;font-family:var(--font-brand);font-weight:700;opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  @keyframes fadeSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="page-title">Prototype Studilife</div>
+<div class="device">
+
+  <!-- LOGIN -->
+  <div class="screen active" id="s-login">
+    <div class="login-bg">
+      <div class="login-logo"><div class="login-logo-inner">SL✦</div></div>
+      <div class="login-title">studilife</div>
+      <div class="login-card">
+        <div class="field-label">Identifiant ENT</div>
+        <input class="field-input" value="prenom.nom@etudiant.univ-spn.fr" readonly>
+        <div class="field-label">Code d'accès</div>
+        <input class="field-input" type="password" value="••••••••••" readonly>
+        <button class="btn-primary" onclick="goTo('s-home')">Se connecter</button>
+        <div class="divider">ou</div>
+        <button class="btn-outline" onclick="goTo('s-home')">Session invitée · Guide uniquement</button>
+        <button class="btn-outline" style="color:#6b7280;font-size:11px;"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:-2px;margin-right:4px;"></i>Tutoriel · Comment ça marche ? ↗</button>
+        <div class="link-small"><i class="ti ti-lock" style="font-size:13px;"></i> Connexion sécurisée via ENT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCUEIL -->
+  <div class="screen" id="s-home">
+    <div class="greeting-box">
+      <div class="greet">Bonjour, Prénom 👋</div>
+      <div class="sub">Que souhaitez-vous faire aujourd'hui ?</div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num">3</div><div class="stat-lbl">Signalements</div></div>
+        <div class="stat-card"><div class="stat-num" style="font-size:22px;">😊</div><div class="stat-lbl">Humeur campus</div></div>
+      </div>
+    </div>
+    <div class="scroll-body">
+      <div class="alert-bar"><i class="ti ti-alert-triangle" style="font-size:14px;flex-shrink:0;"></i> Fermeture BU – vendredi 28/03</div>
+      <div class="section-title">Actions rapides</div>
+      <div class="action-card" onclick="goTo('s-guide')">
+        <div class="action-icon blue"><i class="ti ti-map-2"></i></div>
+        <div class="action-text"><div class="t">Guide de l'université</div><div class="s">Carte et géolocalisation</div></div>
+        <i class="ti ti-chevron-right action-arrow"></i>
+      </div>
+      <div class="action-card" onclick="goTo('s-signal')">
+        <div class="action-icon orange"><i class="ti ti-alert-circle"></i></div>
+        <div class="action-text"><div class="t">Signaler un problème</div><div class="s">Infrastructure, matériel…</div></div>
+        <i class="ti ti-chevron-right action-arrow"></i>
+      </div>
+      <div class="action-card" onclick="goTo('s-wellbeing')">
+        <div class="action-icon green"><i class="ti ti-mood-smile"></i></div>
+        <div class="action-text"><div class="t">Mon bien-être</div><div class="s">Humeur anonyme</div></div>
+        <i class="ti ti-chevron-right action-arrow"></i>
+      </div>
+    </div>
+    <div class="navbar">
+      <button class="nav-btn active" onclick="goTo('s-home')"><i class="ti ti-home"></i><span>Accueil</span></button>
+      <button class="nav-btn" onclick="goTo('s-guide')"><i class="ti ti-map-2"></i><span>Guide</span></button>
+      <button class="nav-btn" onclick="goTo('s-signal')"><i class="ti ti-alert-triangle"></i><span>Signaler</span></button>
+      <button class="nav-btn" onclick="goTo('s-wellbeing')"><i class="ti ti-mood-smile"></i><span>Bien-être</span></button>
+      <button class="nav-btn" onclick="goTo('s-profil')"><i class="ti ti-user"></i><span>Profil</span></button>
+    </div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="screen" id="s-guide">
+    <div class="top-bar">
+      <div class="logo"><div class="logo-circle">SL✦</div>studilife</div>
+      <span style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.75);">Campus Villetaneuse</span>
+    </div>
+    <div class="scroll-body">
+      <div class="screen-heading">Guide du campus</div>
+      <div class="search-bar"><i class="ti ti-search" style="color:var(--muted);font-size:16px;"></i><input placeholder="Rechercher une salle…" readonly></div>
+      <div class="map-container">
+        <iframe id="osmFrame" src="https://www.openstreetmap.org/export/embed.html?bbox=2.3362%2C48.9535%2C2.3472%2C48.9590&layer=mapnik&marker=48.9561%2C2.3413" allowfullscreen loading="lazy" title="Carte campus Villetaneuse"></iframe>
+        <div class="map-zoom">
+          <button onclick="zoomIn()">+</button>
+          <button onclick="zoomOut()">−</button>
+        </div>
+        <button class="map-overlay-btn" id="posBtn" onclick="togglePos()">
+          <i class="ti ti-current-location"></i>
+          <span id="posBtnLabel">Ma position</span>
+        </button>
+      </div>
+      <div class="section-title">Accès rapide</div>
+      <div class="place-row" onclick="focusPlace(48.9568,2.3408,'Bibliothèque universitaire')">
+        <div class="place-icon"><i class="ti ti-building-library"></i></div>
+        <div class="place-info"><div class="t">Bibliothèque univ.</div><div class="s">Ouvert · jusqu'à 20h · Bât. A</div></div>
+        <span class="place-badge badge-free">Libre</span>
+      </div>
+      <div class="place-row" onclick="focusPlace(48.9555,2.3420,'Scolarité')">
+        <div class="place-icon"><i class="ti ti-school"></i></div>
+        <div class="place-info"><div class="t">Scolarité & Admin</div><div class="s">Sur rdv · 9h–12h · Bât. C</div></div>
+        <span class="place-badge badge-rdv">Rdv</span>
+      </div>
+      <div class="place-row" onclick="focusPlace(48.9558,2.3415,'Restaurant universitaire')">
+        <div class="place-icon"><i class="ti ti-tools-kitchen-2"></i></div>
+        <div class="place-info"><div class="t">Restaurant univ.</div><div class="s">11h30–14h · tous les jours</div></div>
+        <span class="place-badge badge-free">Libre</span>
+      </div>
+      <div class="place-row">
+        <div class="place-icon"><i class="ti ti-map"></i></div>
+        <div class="place-info"><div class="t">Carte statique</div><div class="s">Plan complet sans GPS</div></div>
+        <span class="place-badge" style="background:#e0e7ff;color:#3730a3;">PDF</span>
+      </div>
+    </div>
+    <div class="navbar">
+      <button class="nav-btn" onclick="goTo('s-home')"><i class="ti ti-home"></i><span>Accueil</span></button>
+      <button class="nav-btn active" onclick="goTo('s-guide')"><i class="ti ti-map-2"></i><span>Guide</span></button>
+      <button class="nav-btn" onclick="goTo('s-signal')"><i class="ti ti-alert-triangle"></i><span>Signaler</span></button>
+      <button class="nav-btn" onclick="goTo('s-wellbeing')"><i class="ti ti-mood-smile"></i><span>Bien-être</span></button>
+      <button class="nav-btn" onclick="goTo('s-profil')"><i class="ti ti-user"></i><span>Profil</span></button>
+    </div>
+  </div>
+
+  <!-- SIGNALER -->
+  <div class="screen" id="s-signal">
+    <div class="signal-header">
+      <div class="title">Signaler un problème</div>
+      <div class="sub">Infrastructure · Matériel · Propreté</div>
+    </div>
+    <div class="scroll-body">
+      <div class="section-title" style="margin-top:0;">Mes signalements récents</div>
+      <div class="recent-item">
+        <div class="dot green"></div>
+        <div class="recent-info"><div class="t">Vidéoprojecteur H103</div><div class="s">Réseau · il y a 2j</div></div>
+        <span class="recent-badge badge-resolu">Résolu</span>
+      </div>
+      <div class="recent-item" style="margin-bottom:14px;">
+        <div class="dot orange"></div>
+        <div class="recent-info"><div class="t">Lumière couloir B2</div><div class="s">Électricité · aujourd'hui</div></div>
+        <span class="recent-badge badge-encours">En cours</span>
+      </div>
+      <div class="section-title">Catégorie du problème</div>
+      <div class="cat-grid">
+        <div class="cat-card" onclick="selectCat(this)"><i class="ti ti-bolt"></i><span>Électricité</span></div>
+        <div class="cat-card selected" onclick="selectCat(this)"><i class="ti ti-tool"></i><span>Plomberie</span></div>
+        <div class="cat-card" onclick="selectCat(this)"><i class="ti ti-wifi"></i><span>Réseau</span></div>
+        <div class="cat-card" onclick="selectCat(this)"><i class="ti ti-armchair"></i><span>Mobilier</span></div>
+        <div class="cat-card" onclick="selectCat(this)"><i class="ti ti-shield"></i><span>Sécurité</span></div>
+        <div class="cat-card" onclick="selectCat(this)"><i class="ti ti-trash"></i><span>Propreté</span></div>
+      </div>
+      <select class="select-field"><option>Bât. H</option><option>Bât. A</option><option>Bât. C</option></select>
+      <select class="select-field"><option>H103</option><option>H104</option><option>H201</option></select>
+      <div class="photo-zone"><i class="ti ti-camera" style="font-size:18px;display:block;margin-bottom:4px;"></i>Ajouter une photo · max 5 Mo</div>
+      <button class="btn-send" onclick="sendSignal()">Envoyer le signalement →</button>
+    </div>
+    <div class="navbar">
+      <button class="nav-btn" onclick="goTo('s-home')"><i class="ti ti-home"></i><span>Accueil</span></button>
+      <button class="nav-btn" onclick="goTo('s-guide')"><i class="ti ti-map-2"></i><span>Guide</span></button>
+      <button class="nav-btn active" onclick="goTo('s-signal')"><i class="ti ti-alert-triangle"></i><span>Signaler</span></button>
+      <button class="nav-btn" onclick="goTo('s-wellbeing')"><i class="ti ti-mood-smile"></i><span>Bien-être</span></button>
+      <button class="nav-btn" onclick="goTo('s-profil')"><i class="ti ti-user"></i><span>Profil</span></button>
+    </div>
+  </div>
+
+  <!-- BIEN-ÊTRE -->
+  <div class="screen" id="s-wellbeing">
+    <div class="wellbeing-header">
+      <div class="title">Mon bien-être</div>
+      <div class="sub">Réponse 100% anonyme</div>
+      <div class="anon-badge"><i class="ti ti-lock" style="font-size:11px;"></i> Réponse anonyme · données agrégées</div>
+    </div>
+    <div class="scroll-body">
+      <div class="mood-q">Comment vous sentez-vous aujourd'hui ?</div>
+      <div class="emoji-row">
+        <button class="emoji-btn" onclick="pickMood(this)"><div class="em">😢</div><div class="lb">Très mauvaise</div></button>
+        <button class="emoji-btn" onclick="pickMood(this)"><div class="em">😕</div><div class="lb">Mauvaise</div></button>
+        <button class="emoji-btn" onclick="pickMood(this)"><div class="em">😐</div><div class="lb">Neutre</div></button>
+        <button class="emoji-btn selected" onclick="pickMood(this)"><div class="em">😊</div><div class="lb">Bonne</div></button>
+        <button class="emoji-btn" onclick="pickMood(this)"><div class="em">😄</div><div class="lb">Très bonne</div></button>
+      </div>
+      <textarea class="textarea-field" placeholder="Partagez ce que vous ressentez… (optionnel)"></textarea>
+      <button class="btn-green" onclick="validerHumeur()">Valider mon humeur ✓</button>
+      <div class="campus-mood">
+        <div class="cm-title">Humeur du campus aujourd'hui</div>
+        <div class="mood-bar-row"><span class="em">😊</span><div class="bar-bg"><div class="bar-fill" style="width:42%;background:#16a34a;"></div></div><span class="bar-pct">42%</span></div>
+        <div class="mood-bar-row"><span class="em">😄</span><div class="bar-bg"><div class="bar-fill" style="width:28%;background:#86efac;"></div></div><span class="bar-pct">28%</span></div>
+        <div class="mood-bar-row"><span class="em">😐</span><div class="bar-bg"><div class="bar-fill" style="width:18%;background:#d1d5db;"></div></div><span class="bar-pct">18%</span></div>
+        <div class="mood-bar-row"><span class="em">😕</span><div class="bar-bg"><div class="bar-fill" style="width:8%;background:var(--orange);"></div></div><span class="bar-pct">8%</span></div>
+        <div class="mood-bar-row"><span class="em">😢</span><div class="bar-bg"><div class="bar-fill" style="width:4%;background:var(--red);"></div></div><span class="bar-pct">4%</span></div>
+      </div>
+    </div>
+    <div class="navbar">
+      <button class="nav-btn" onclick="goTo('s-home')"><i class="ti ti-home"></i><span>Accueil</span></button>
+      <button class="nav-btn" onclick="goTo('s-guide')"><i class="ti ti-map-2"></i><span>Guide</span></button>
+      <button class="nav-btn" onclick="goTo('s-signal')"><i class="ti ti-alert-triangle"></i><span>Signaler</span></button>
+      <button class="nav-btn active" onclick="goTo('s-wellbeing')"><i class="ti ti-mood-smile"></i><span>Bien-être</span></button>
+      <button class="nav-btn" onclick="goTo('s-profil')"><i class="ti ti-user"></i><span>Profil</span></button>
+    </div>
+  </div>
+
+  <!-- PROFIL -->
+  <div class="screen" id="s-profil">
+    <div class="profil-header">
+      <div class="avatar"><div class="avatar-init">PN</div></div>
+      <div class="profil-name">Prénom Nom</div>
+      <div class="profil-sub">Étudiant(e) · Master 3 · USPN</div>
+      <div class="status-pill"><div class="status-dot"></div>Actif</div>
+    </div>
+    <div class="scroll-body">
+      <div class="info-row"><i class="ti ti-user-circle"></i><div><div class="t">Nom complet</div><div class="s">Prénom · Nom</div></div></div>
+      <div class="info-row"><i class="ti ti-mail"></i><div><div class="t">Email universitaire</div><div class="s">prenem.nem@etudiant.univ-spn.fr</div></div></div>
+      <div class="info-row"><i class="ti ti-building"></i><div><div class="t">UFR / Département</div><div class="s">Institut Galilée · Big Data</div></div></div>
+      <div class="info-row"><i class="ti ti-id-badge"></i><div><div class="t">N° étudiant</div><div class="s">XXXXXXXX</div></div></div>
+      <div class="pref-section">Préférences</div>
+      <div class="pref-row"><i class="ti ti-bell"></i><span class="lbl">Notifications</span><div class="toggle"><div class="toggle-knob"></div></div></div>
+      <div class="pref-row"><i class="ti ti-moon"></i><span class="lbl">Mode sombre</span><div class="toggle toggle-off"><div class="toggle-knob"></div></div></div>
+      <div class="pref-row"><i class="ti ti-world"></i><span class="lbl">Langue</span><span class="pref-val">Français ›</span></div>
+      <button class="btn-logout" onclick="goTo('s-login')">Se déconnecter</button>
+    </div>
+    <div class="navbar">
+      <button class="nav-btn" onclick="goTo('s-home')"><i class="ti ti-home"></i><span>Accueil</span></button>
+      <button class="nav-btn" onclick="goTo('s-guide')"><i class="ti ti-map-2"></i><span>Guide</span></button>
+      <button class="nav-btn" onclick="goTo('s-signal')"><i class="ti ti-alert-triangle"></i><span>Signaler</span></button>
+      <button class="nav-btn" onclick="goTo('s-wellbeing')"><i class="ti ti-mood-smile"></i><span>Bien-être</span></button>
+      <button class="nav-btn active" onclick="goTo('s-profil')"><i class="ti ti-user"></i><span>Profil</span></button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const BASE_LAT=48.9561,BASE_LON=2.3413;
+let zoomLevel=17,posActive=false;
+function buildOsmUrl(lat,lon,zoom){const d=0.002*Math.pow(2,17-zoom);const bbox=`${lon-d}%2C${lat-d*0.6}%2C${lon+d}%2C${lat+d*0.6}`;return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`;}
+function refreshMap(lat,lon,zoom){document.getElementById('osmFrame').src=buildOsmUrl(lat,lon,zoom);}
+function zoomIn(){if(zoomLevel<19){zoomLevel++;refreshMap(BASE_LAT,BASE_LON,zoomLevel);}}
+function zoomOut(){if(zoomLevel>14){zoomLevel--;refreshMap(BASE_LAT,BASE_LON,zoomLevel);}}
+function togglePos(){posActive=!posActive;const btn=document.getElementById('posBtn');const lbl=document.getElementById('posBtnLabel');if(posActive){btn.classList.add('active');lbl.textContent='Localisé ✓';zoomLevel=18;refreshMap(BASE_LAT,BASE_LON,zoomLevel);showToast('📍 Position détectée — Campus Villetaneuse');}else{btn.classList.remove('active');lbl.textContent='Ma position';zoomLevel=17;refreshMap(BASE_LAT,BASE_LON,zoomLevel);}}
+function focusPlace(lat,lon,name){const d=0.0012;const bbox=`${lon-d}%2C${lat-d*0.6}%2C${lon+d}%2C${lat+d*0.6}`;document.getElementById('osmFrame').src=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`;showToast('📍 '+name);}
+function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function selectCat(el){document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');}
+function pickMood(el){document.querySelectorAll('.emoji-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+function sendSignal(){showToast('✓ Signalement envoyé !');}
+function validerHumeur(){showToast('✓ Humeur enregistrée !');}
+</script>
+</body>
+</html>
