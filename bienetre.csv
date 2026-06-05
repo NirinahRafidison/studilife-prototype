@@ -1,0 +1,61 @@
+mois,humeur,nb_reponses,note_moyenne
+Jun,Excellent,50,55
+Jun,Très bon,125,48
+Jun,Bon,175,42
+Jun,Neutre,75,38
+Jun,Médiocre,50,32
+Jun,Mauvais,25,28
+Mar,Excellent,48,52
+Mar,Très bon,120,46
+Mar,Bon,168,40
+Mar,Neutre,72,36
+Mar,Médiocre,48,30
+Mar,Mauvais,24,26
+Apr,Excellent,52,54
+Apr,Très bon,128,47
+Apr,Bon,172,41
+Apr,Neutre,76,37
+Apr,Médiocre,52,31
+Apr,Mauvais,26,27
+Mai,Excellent,55,56
+Mai,Très bon,132,49
+Mai,Bon,176,43
+Mai,Neutre,78,39
+Mai,Médiocre,54,33
+Mai,Mauvais,27,29
+Jul,Excellent,58,57
+Jul,Très bon,136,50
+Jul,Bon,180,44
+Jul,Neutre,80,40
+Jul,Médiocre,56,34
+Jul,Mauvais,28,30
+Aug,Excellent,60,58
+Aug,Très bon,140,51
+Aug,Bon,184,45
+Aug,Neutre,82,41
+Aug,Médiocre,58,35
+Aug,Mauvais,29,31
+Sep,Excellent,56,57
+Sep,Très bon,135,50
+Sep,Bon,178,44
+Sep,Neutre,79,40
+Sep,Médiocre,55,34
+Sep,Mauvais,27,30
+Oct,Excellent,54,56
+Oct,Très bon,130,49
+Oct,Bon,175,43
+Oct,Neutre,77,39
+Oct,Médiocre,53,33
+Oct,Mauvais,26,29
+Nov,Excellent,52,55
+Nov,Très bon,128,48
+Nov,Bon,172,42
+Nov,Neutre,76,38
+Nov,Médiocre,52,32
+Nov,Mauvais,26,28
+Dec,Excellent,50,54
+Dec,Très bon,125,47
+Dec,Bon,170,41
+Dec,Neutre,74,37
+Dec,Médiocre,50,31
+Dec,Mauvais,25,27
